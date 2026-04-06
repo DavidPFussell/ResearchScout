@@ -1,0 +1,28 @@
+name: Daily Research Agent
+
+on:
+  schedule:
+    - cron: '0 13 * * *' # Runs every day at 13:00 UTC (8:00 AM EST)
+  workflow_dispatch: # Allows you to run it manually
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install arxiv openai requests
+
+      - name: Run Agent
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: python paper_agent.py
