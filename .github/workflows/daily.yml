@@ -18,9 +18,7 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
-        run: |
-          pip install arxiv openai requests
-
+        run: pip install arxiv openai requests feedparser
       - name: Run Agent
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
