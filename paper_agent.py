@@ -5,8 +5,8 @@ import requests
 from openai import OpenAI
 
 # Configuration - Change your keywords here
-KEYWORDS = '("large language model" OR "multi-agent" OR "transformer architecture")'
-LLM_MODEL = "gpt-4o-mini" # Fast and cheap
+KEYWORDS = '(cat:cs.CL OR cat:cs.LG OR cat:cs.AI OR cat:cs.MA)'
+LLM_MODEL = "gpt-4.1-mini" # Fast and cheap
 
 # Initialize OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -53,17 +53,22 @@ def summarize_papers(papers):
     
     return report
 
-def send_notification(text):
-    # Sends to Discord (easiest way to get a free notification)
-    webhook_url = os.getenv("DISCORD_WEBHOOK")
-    if webhook_url:
-        requests.post(webhook_url, json={"content": text})
-    print(text)
-
+def send_to_slack(blocks):
+    webhook_url = os.getenv("SLACK_WEBHOOK")
+    if webhook_url and blocks:
+        payload = {
+            "username": "scout", # The name shown in the channel
+            "icon_emoji": ":robot_face:",  # The avatar
+            "blocks": blocks
+        }
+        response = requests.post(webhook_url, json=payload)
+        if response.status_code != 200:
+            print(f"Error: {response.text}")
+            
 if __name__ == "__main__":
     new_papers = get_latest_papers()
     if new_papers:
         final_report = summarize_papers(new_papers)
-        send_notification(final_report)
+        send_to_slack(final_report)
     else:
         print("No new papers to report.")
